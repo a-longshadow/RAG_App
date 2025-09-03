@@ -1,25 +1,15 @@
-# Nixpacks Configuration for Railway.com
-# Optimized for Django RAG application with PostgreSQL and AI/ML packages
+# Railway Nixpacks Configuration - Minimal and Stable
+# Focus on Python 3.12 with essential build tools
 
 [variables]
 NIXPACKS_PYTHON_VERSION = "3.12"
-PYTHONPATH = "/app"
 
 [phases.setup]
-nixPkgs = [
-    "python312",
-    "postgresql_17", 
-    "pkg-config",
-    "gcc",
-    "g++",
-    "libffi",
-    "openssl"
-]
+nixPkgs = ["python312", "gcc", "pkg-config"]
 
 [phases.install]
 cmds = [
     "pip install --upgrade pip",
-    "pip install wheel setuptools",
     "pip install -r requirements.txt"
 ]
 
@@ -29,4 +19,4 @@ cmds = [
 ]
 
 [start]
-cmd = "gunicorn django_rag.wsgi:application --bind 0.0.0.0:$PORT --workers 4 --worker-class sync --worker-connections 1000 --max-requests 1000 --max-requests-jitter 100 --timeout 30"
+cmd = "gunicorn django_rag.wsgi:application --bind 0.0.0.0:$PORT --workers 4"
