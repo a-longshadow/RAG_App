@@ -36,14 +36,9 @@ RAILWAY_ENVIRONMENT = os.getenv('RAILWAY_ENVIRONMENT')
 if RAILWAY_ENVIRONMENT:
     DEBUG = False
 
-ALLOWED_HOSTS = ['testserver', 'localhost', '127.0.0.1', '*.railway.app']
-if RAILWAY_ENVIRONMENT:
-    ALLOWED_HOSTS.extend(['*.up.railway.app', os.getenv('RAILWAY_STATIC_URL', '').replace('https://', '')])
-
-# Add Railway domain if present
-RAILWAY_DOMAIN = os.getenv('RAILWAY_PUBLIC_DOMAIN')
-if RAILWAY_DOMAIN:
-    ALLOWED_HOSTS.append(RAILWAY_DOMAIN)
+ALLOWED_HOSTS = ['*']  # Allow all hosts for Railway deployment
+if not RAILWAY_ENVIRONMENT:
+    ALLOWED_HOSTS = ['testserver', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -173,6 +168,12 @@ if RAILWAY_ENVIRONMENT:
     # CSRF settings
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
+    
+    # CSRF trusted origins for Railway
+    CSRF_TRUSTED_ORIGINS = [
+        'https://*.railway.app',
+        'https://*.up.railway.app',
+    ]
 
 # Login URLs
 LOGIN_URL = '/admin/login/'

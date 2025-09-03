@@ -1,0 +1,727 @@
+1
+00:00:02,480 --> 00:00:04,160
+Hi guys, welcome back to the channel and
+
+2
+00:00:04,160 --> 00:00:05,200
+today I'm going to show you how you can
+
+3
+00:00:05,200 --> 00:00:07,680
+deploy a Django application on railway
+
+4
+00:00:07,680 --> 00:00:10,800
+for 100% free. So railway is basically a
+
+5
+00:00:10,800 --> 00:00:12,400
+deploying service and host hosting
+
+6
+00:00:12,400 --> 00:00:15,040
+service as well which deploys your
+
+7
+00:00:15,040 --> 00:00:17,520
+applications in just in very simple
+
+8
+00:00:17,520 --> 00:00:20,080
+steps including automation for GitHub
+
+9
+00:00:20,080 --> 00:00:21,600
+repositories as well. So we're just
+
+10
+00:00:21,600 --> 00:00:23,680
+going to learn that how we can deploy a
+
+11
+00:00:23,680 --> 00:00:25,760
+Django application from our GitHub
+
+12
+00:00:25,760 --> 00:00:28,720
+repository in just few simple clicks. So
+
+13
+00:00:28,720 --> 00:00:30,640
+let's begin. So first of all head up to
+
+14
+00:00:30,640 --> 00:00:31,840
+the railways official website
+
+15
+00:00:31,840 --> 00:00:34,160
+railway.com and create an account
+
+16
+00:00:34,160 --> 00:00:36,239
+railway using GitHub Google account or
+
+17
+00:00:36,239 --> 00:00:39,040
+email as you wish and we can create the
+
+18
+00:00:39,040 --> 00:00:41,520
+account by clicking on this login button
+
+19
+00:00:41,520 --> 00:00:43,920
+and you can create something with GitHub
+
+20
+00:00:43,920 --> 00:00:45,600
+or you can also create it with Google
+
+21
+00:00:45,600 --> 00:00:48,800
+and just normal email. All right. So
+
+22
+00:00:48,800 --> 00:00:50,559
+after you have created your railway
+
+23
+00:00:50,559 --> 00:00:52,480
+account you can head up to the dashboard
+
+24
+00:00:52,480 --> 00:00:54,079
+which would which would look like
+
+25
+00:00:54,079 --> 00:00:56,000
+something like this. So we can create a
+
+26
+00:00:56,000 --> 00:00:58,640
+new project here. And let me just show
+
+27
+00:00:58,640 --> 00:01:00,320
+you what are we going to deploy today.
+
+28
+00:01:00,320 --> 00:01:01,920
+This is the test Django application
+
+29
+00:01:01,920 --> 00:01:05,280
+inside my GitHub repository which is um
+
+30
+00:01:05,280 --> 00:01:08,799
+just a simple uh structure having an
+
+31
+00:01:08,799 --> 00:01:11,119
+application app and we have the test
+
+32
+00:01:11,119 --> 00:01:12,799
+which is the back end of this
+
+33
+00:01:12,799 --> 00:01:15,600
+application and we have a manage.py and
+
+34
+00:01:15,600 --> 00:01:17,759
+then we have a requirements.txt which I
+
+35
+00:01:17,759 --> 00:01:20,720
+have built using the pip freeze command.
+
+36
+00:01:20,720 --> 00:01:23,040
+All right. So we can now move forward to
+
+37
+00:01:23,040 --> 00:01:25,040
+deploying our railway application. So
+
+38
+00:01:25,040 --> 00:01:26,799
+for this just click on create a new
+
+39
+00:01:26,799 --> 00:01:28,880
+project and you have some options right
+
+40
+00:01:28,880 --> 00:01:30,560
+here. So we are just going to deploy it
+
+41
+00:01:30,560 --> 00:01:31,960
+from a GitHub
+
+42
+00:01:31,960 --> 00:01:34,400
+repository. So if you are you have not
+
+43
+00:01:34,400 --> 00:01:36,240
+logged in with GitHub account inside
+
+44
+00:01:36,240 --> 00:01:37,920
+your railway application then you will
+
+45
+00:01:37,920 --> 00:01:39,200
+not be able to see these two
+
+46
+00:01:39,200 --> 00:01:41,280
+repositories like I am going to see. So
+
+47
+00:01:41,280 --> 00:01:42,799
+for this you will have to configure the
+
+48
+00:01:42,799 --> 00:01:45,040
+GitHub app by clicking on this button
+
+49
+00:01:45,040 --> 00:01:47,360
+and then it will prompt you to uh pass
+
+50
+00:01:47,360 --> 00:01:49,119
+in the username and password for your
+
+51
+00:01:49,119 --> 00:01:51,200
+GitHub account and then you'll be logged
+
+52
+00:01:51,200 --> 00:01:53,040
+in with your GitHub account inside your
+
+53
+00:01:53,040 --> 00:01:55,520
+Railway application. All right. So for
+
+54
+00:01:55,520 --> 00:01:58,240
+me I have logged in inside Railway using
+
+55
+00:01:58,240 --> 00:02:00,479
+my GitHub account. So I have I am able
+
+56
+00:02:00,479 --> 00:02:02,240
+to see my two repositories right here.
+
+57
+00:02:02,240 --> 00:02:04,960
+So for this uh demonstration we are
+
+58
+00:02:04,960 --> 00:02:06,719
+going to deploy the test Django
+
+59
+00:02:06,719 --> 00:02:08,479
+application. So I'll just click on this
+
+60
+00:02:08,479 --> 00:02:10,399
+and now it will start the deployment
+
+61
+00:02:10,399 --> 00:02:12,640
+process. So currently it does not have
+
+62
+00:02:12,640 --> 00:02:14,560
+any start or build command. So it is
+
+63
+00:02:14,560 --> 00:02:16,959
+going to pop some error for us something
+
+64
+00:02:16,959 --> 00:02:19,440
+like uh we do not have a start command.
+
+65
+00:02:19,440 --> 00:02:21,840
+So for this we are going to change the
+
+66
+00:02:21,840 --> 00:02:23,520
+start command and the build command for
+
+67
+00:02:23,520 --> 00:02:25,760
+this. So let me just wait for this and
+
+68
+00:02:25,760 --> 00:02:28,080
+let's wait for this to throw some error
+
+69
+00:02:28,080 --> 00:02:31,239
+for us.
+
+70
+00:02:32,480 --> 00:02:34,319
+So as you can see in the settings we
+
+71
+00:02:34,319 --> 00:02:38,400
+have uh no start command and no build
+
+72
+00:02:38,400 --> 00:02:40,560
+command. So we have to edit these
+
+73
+00:02:40,560 --> 00:02:43,760
+commands as uh for now. So let's just
+
+74
+00:02:43,760 --> 00:02:46,319
+wait for seeing what's happening right
+
+75
+00:02:46,319 --> 00:02:49,319
+here.
+
+76
+00:03:09,599 --> 00:03:12,480
+So for this project we I think railway
+
+77
+00:03:12,480 --> 00:03:14,599
+has automatically automatically
+
+78
+00:03:14,599 --> 00:03:18,000
+detected. So for cut so for this project
+
+79
+00:03:18,000 --> 00:03:19,519
+I think railway has automatically
+
+80
+00:03:19,519 --> 00:03:21,280
+detected that it's a Django project and
+
+81
+00:03:21,280 --> 00:03:23,599
+it has done the basic build and start
+
+82
+00:03:23,599 --> 00:03:26,959
+commands on its own. But if it gives uh
+
+83
+00:03:26,959 --> 00:03:30,239
+some kind of error for you can define uh
+
+84
+00:03:30,239 --> 00:03:32,560
+start commands on your own like I'm
+
+85
+00:03:32,560 --> 00:03:34,319
+going to do now. So you have you can
+
+86
+00:03:34,319 --> 00:03:37,120
+click a build command here which can be
+
+87
+00:03:37,120 --> 00:03:38,560
+your build command something like tape
+
+88
+00:03:38,560 --> 00:03:40,799
+install requirements.txt txt and you if
+
+89
+00:03:40,799 --> 00:03:42,720
+you have some static folder you can also
+
+90
+00:03:42,720 --> 00:03:46,799
+run uh collect static function by
+
+91
+00:03:46,799 --> 00:03:49,120
+writing double emp% and then you can
+
+92
+00:03:49,120 --> 00:03:52,480
+write python manage py
+
+93
+00:03:52,480 --> 00:03:56,040
+uh collect static and make sure you you
+
+94
+00:03:56,040 --> 00:03:59,200
+write no input because we do not have
+
+95
+00:03:59,200 --> 00:04:00,120
+access
+
+96
+00:04:00,120 --> 00:04:03,519
+to the CLI for this server right now and
+
+97
+00:04:03,519 --> 00:04:04,959
+also if you want to run the migrations
+
+98
+00:04:04,959 --> 00:04:06,879
+you can also run it right here by
+
+99
+00:04:06,879 --> 00:04:10,000
+running the command pythm py I make
+
+100
+00:04:10,000 --> 00:04:12,720
+migrations after the double amperson.
+
+101
+00:04:12,720 --> 00:04:14,480
+All right. So for me, I do not have any
+
+102
+00:04:14,480 --> 00:04:16,320
+static files or migrations. So I'll just
+
+103
+00:04:16,320 --> 00:04:18,239
+skip this part and I'll just use the pip
+
+104
+00:04:18,239 --> 00:04:20,880
+install our requirements.txt. And then
+
+105
+00:04:20,880 --> 00:04:23,040
+for the start command, we can just put
+
+106
+00:04:23,040 --> 00:04:26,160
+something like python manage.py ey run
+
+107
+00:04:26,160 --> 00:04:27,759
+server and make sure to run this
+
+108
+00:04:27,759 --> 00:04:30,280
+application on the
+
+109
+00:04:30,280 --> 00:04:34,320
+0.0.0.08,000 port, not the 127 uh port
+
+110
+00:04:34,320 --> 00:04:35,240
+because
+
+111
+00:04:35,240 --> 00:04:38,320
+0.0.0.0 zero actually enables all the
+
+112
+00:04:38,320 --> 00:04:40,600
+hosts to to access our Django
+
+113
+00:04:40,600 --> 00:04:42,880
+application. All right. So we can set
+
+114
+00:04:42,880 --> 00:04:44,720
+this as the custom start command and
+
+115
+00:04:44,720 --> 00:04:46,400
+this as the custom build command and
+
+116
+00:04:46,400 --> 00:04:49,120
+this will also deploy our application.
+
+117
+00:04:49,120 --> 00:04:52,479
+So now if I save these uh commands and
+
+118
+00:04:52,479 --> 00:04:54,080
+apply the changes, it should start the
+
+119
+00:04:54,080 --> 00:04:56,479
+deployment process again and we'll see
+
+120
+00:04:56,479 --> 00:04:58,479
+uh how it goes. So it has started the
+
+121
+00:04:58,479 --> 00:05:01,120
+process and you can see it is starting
+
+122
+00:05:01,120 --> 00:05:03,280
+to install the requirements using the
+
+123
+00:05:03,280 --> 00:05:07,360
+command pip install- r requirements.txt.
+
+124
+00:05:07,880 --> 00:05:10,240
+txt. Perfect. And now I think it will
+
+125
+00:05:10,240 --> 00:05:13,039
+attempt to start the application using
+
+126
+00:05:13,039 --> 00:05:15,800
+the command uh python
+
+127
+00:05:15,800 --> 00:05:17,840
+manage.py.ver. So let's just wait for
+
+128
+00:05:17,840 --> 00:05:21,360
+this application to go
+
+129
+00:05:30,360 --> 00:05:33,199
+live. All right. So you can see my
+
+130
+00:05:33,199 --> 00:05:35,520
+service is actually active right now.
+
+131
+00:05:35,520 --> 00:05:38,160
+That means my application is running but
+
+132
+00:05:38,160 --> 00:05:41,360
+we cannot access it on a public IP right
+
+133
+00:05:41,360 --> 00:05:43,280
+now because we have not generated a
+
+134
+00:05:43,280 --> 00:05:45,360
+public IP. So for this just go to the
+
+135
+00:05:45,360 --> 00:05:47,919
+settings of the project and now uh you
+
+136
+00:05:47,919 --> 00:05:52,400
+can go inside the I think you can go
+
+137
+00:06:20,080 --> 00:06:22,080
+All
+
+138
+00:06:30,400 --> 00:06:34,319
+right. So to make this cut, all right.
+
+139
+00:06:34,319 --> 00:06:37,520
+So to make this uh project go live on a
+
+140
+00:06:37,520 --> 00:06:39,919
+public URL, you can head to the settings
+
+141
+00:06:39,919 --> 00:06:41,560
+in the project and then go to the
+
+142
+00:06:41,560 --> 00:06:43,919
+visibility setting and then click on
+
+143
+00:06:43,919 --> 00:06:45,759
+change visibility and paste the project
+
+144
+00:06:45,759 --> 00:06:49,360
+name here. So this now we can actually
+
+145
+00:06:49,360 --> 00:06:51,360
+uh make this now we have actually made
+
+146
+00:06:51,360 --> 00:06:54,000
+this project public. So I think we will
+
+147
+00:06:54,000 --> 00:06:56,400
+be able to access our project with the
+
+148
+00:06:56,400 --> 00:06:58,240
+URL of our project. So let's just see
+
+149
+00:06:58,240 --> 00:07:00,639
+how we are able to access it. I just
+
+150
+00:07:00,639 --> 00:07:02,560
+click here and then we can see the
+
+151
+00:07:02,560 --> 00:07:05,599
+public URL right
+
+152
+00:07:18,759 --> 00:07:21,280
+here. All right. So I I'll now show you
+
+153
+00:07:21,280 --> 00:07:23,280
+how you can make your application go
+
+154
+00:07:23,280 --> 00:07:25,759
+public with a public URL. So just click
+
+155
+00:07:25,759 --> 00:07:27,599
+on this project right here and then go
+
+156
+00:07:27,599 --> 00:07:30,000
+inside the settings and scroll down till
+
+157
+00:07:30,000 --> 00:07:32,240
+you see public networking. So now we
+
+158
+00:07:32,240 --> 00:07:34,319
+need to create a domain for this. So now
+
+159
+00:07:34,319 --> 00:07:37,039
+click on generate domain right here. And
+
+160
+00:07:37,039 --> 00:07:38,800
+now it will generate a domain for us
+
+161
+00:07:38,800 --> 00:07:42,000
+which will help uh us to access this
+
+162
+00:07:42,000 --> 00:07:44,160
+application on our browser. So we it has
+
+163
+00:07:44,160 --> 00:07:46,479
+generated this port uh this URL right
+
+164
+00:07:46,479 --> 00:07:48,400
+here. And now if I open this URL, I
+
+165
+00:07:48,400 --> 00:07:49,759
+should be able to access a Django
+
+166
+00:07:49,759 --> 00:07:52,080
+application in any browser. So let's
+
+167
+00:07:52,080 --> 00:07:54,800
+just test it out.
+
+168
+00:07:54,800 --> 00:07:57,280
+And perfect. So we have got the sample
+
+169
+00:07:57,280 --> 00:07:59,120
+page here which is this is a sample
+
+170
+00:07:59,120 --> 00:08:00,639
+Django project which is which was
+
+171
+00:08:00,639 --> 00:08:03,199
+exactly present inside my GitHub
+
+172
+00:08:03,199 --> 00:08:05,199
+repository. So we have successfully
+
+173
+00:08:05,199 --> 00:08:07,000
+deployed our Django application on
+
+174
+00:08:07,000 --> 00:08:10,080
+railway for 100% free. So we basically
+
+175
+00:08:10,080 --> 00:08:13,360
+we get a $5 worth of free credits which
+
+176
+00:08:13,360 --> 00:08:15,840
+is a lot when it comes to building hobby
+
+177
+00:08:15,840 --> 00:08:18,800
+projects or static websites. So we uh
+
+178
+00:08:18,800 --> 00:08:21,280
+have this is essentially free for a long
+
+179
+00:08:21,280 --> 00:08:23,840
+time a period. So we have learned how we
+
+180
+00:08:23,840 --> 00:08:25,599
+can deploy a Django application on
+
+181
+00:08:25,599 --> 00:08:27,520
+railway and that's it for the video. So
+
+182
+00:08:27,520 --> 00:08:30,800
+thanks for watching.

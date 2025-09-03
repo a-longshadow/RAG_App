@@ -1,0 +1,627 @@
+1
+00:00:00,280 --> 00:00:02,399
+in this video let us see how to deploy
+
+2
+00:00:02,399 --> 00:00:04,960
+ajango project on playway so this is the
+
+3
+00:00:04,960 --> 00:00:06,600
+Jango project as you can see it is
+
+4
+00:00:06,600 --> 00:00:08,960
+running on the local Force let us see
+
+5
+00:00:08,960 --> 00:00:11,759
+how to deploy this project to the raway
+
+6
+00:00:11,759 --> 00:00:14,120
+it is similar to ver.com so let us see
+
+7
+00:00:14,120 --> 00:00:16,640
+how to deploy to this before we proceed
+
+8
+00:00:16,640 --> 00:00:18,520
+ahead we need to create some
+
+9
+00:00:18,520 --> 00:00:20,519
+configuration files so that raway can
+
+10
+00:00:20,519 --> 00:00:24,039
+deploy our project easily so this is my
+
+11
+00:00:24,039 --> 00:00:26,199
+jro project this is where my settings
+
+12
+00:00:26,199 --> 00:00:29,240
+that Bei is located and this is my jro
+
+13
+00:00:29,240 --> 00:00:31,800
+app we need to create the prop file the
+
+14
+00:00:31,800 --> 00:00:34,360
+file don't have any extension so this is
+
+15
+00:00:34,360 --> 00:00:37,360
+the file make sure you don't type any
+
+16
+00:00:37,360 --> 00:00:40,559
+extension then inside this we need to
+
+17
+00:00:40,559 --> 00:00:42,280
+copy and paste this I will provide the
+
+18
+00:00:42,280 --> 00:00:43,640
+link of this repository in the
+
+19
+00:00:43,640 --> 00:00:45,960
+description you can Che that out so let
+
+20
+00:00:45,960 --> 00:00:48,920
+me copy this and paste it in the prop
+
+21
+00:00:48,920 --> 00:00:52,760
+file here in the project name replace it
+
+22
+00:00:52,760 --> 00:00:55,600
+with your project name in this case
+
+23
+00:00:55,600 --> 00:00:57,640
+portfolio is me project name I will typ
+
+24
+00:00:57,640 --> 00:01:00,160
+that here
+
+25
+00:01:00,160 --> 00:01:03,199
+and also change that to portfolio now we
+
+26
+00:01:03,199 --> 00:01:05,720
+have created this stop file next we need
+
+27
+00:01:05,720 --> 00:01:08,880
+to create the run. text file here we
+
+28
+00:01:08,880 --> 00:01:11,240
+need to define the python version to get
+
+29
+00:01:11,240 --> 00:01:12,920
+the python version that is running on
+
+30
+00:01:12,920 --> 00:01:16,320
+your system open the terminal or command
+
+31
+00:01:16,320 --> 00:01:18,680
+front I'm going to open your terminal
+
+32
+00:01:18,680 --> 00:01:21,479
+here just type python iPhone iPhone
+
+33
+00:01:21,479 --> 00:01:24,880
+version this will give you the version
+
+34
+00:01:24,880 --> 00:01:27,680
+of python let me copy this python
+
+35
+00:01:27,680 --> 00:01:31,920
+version and paste it here
+
+36
+00:01:32,240 --> 00:01:34,880
+next we need to create the requirement.
+
+37
+00:01:34,880 --> 00:01:37,880
+x file mandator you need to have the Gan
+
+38
+00:01:37,880 --> 00:01:41,720
+and the white noise so let me type the
+
+39
+00:01:41,720 --> 00:01:44,560
+requirements here the gicon and the
+
+40
+00:01:44,560 --> 00:01:46,960
+white noise are mandatory here because
+
+41
+00:01:46,960 --> 00:01:49,320
+using the white no we will save the
+
+42
+00:01:49,320 --> 00:01:50,719
+static
+
+43
+00:01:50,719 --> 00:01:54,159
+files so let's save this file also now
+
+44
+00:01:54,159 --> 00:01:56,119
+we have created these three files then
+
+45
+00:01:56,119 --> 00:01:59,600
+we need to change the settings we need
+
+46
+00:01:59,600 --> 00:02:01,240
+to add this white noes in the
+
+47
+00:02:01,240 --> 00:02:03,560
+settings.py file let me copy that and
+
+48
+00:02:03,560 --> 00:02:06,439
+open your settings.py
+
+49
+00:02:06,439 --> 00:02:10,119
+file here replace allow Force to Aster
+
+50
+00:02:10,119 --> 00:02:12,480
+because we don't know the URL on the
+
+51
+00:02:12,480 --> 00:02:16,120
+raway app so that's why we allow it to
+
+52
+00:02:16,120 --> 00:02:19,920
+Aster here in the middleware just P it
+
+53
+00:02:19,920 --> 00:02:22,640
+here through the White Noise We Will St
+
+54
+00:02:22,640 --> 00:02:26,440
+the static files because rway itself
+
+55
+00:02:26,440 --> 00:02:28,920
+don't serve the static files we will
+
+56
+00:02:28,920 --> 00:02:30,840
+save it through the white nice then at
+
+57
+00:02:30,840 --> 00:02:32,519
+the bottom of the file we need to add
+
+58
+00:02:32,519 --> 00:02:34,599
+another line so let me copy the second
+
+59
+00:02:34,599 --> 00:02:37,120
+line and paste it at the bottom of the.
+
+60
+00:02:37,120 --> 00:02:39,319
+pyi now we have completed the settings
+
+61
+00:02:39,319 --> 00:02:41,319
+that
+
+62
+00:02:41,319 --> 00:02:44,040
+file I think we have configured
+
+63
+00:02:44,040 --> 00:02:48,360
+everything let push it to the G up
+
+64
+00:02:48,360 --> 00:02:52,239
+now let me add this and then commit this
+
+65
+00:02:52,239 --> 00:02:55,159
+files so let's push the changes to the
+
+66
+00:02:55,159 --> 00:02:57,599
+GitHub now I have successfully updated
+
+67
+00:02:57,599 --> 00:03:00,440
+all my files to the GitHub
+
+68
+00:03:00,440 --> 00:03:02,360
+after you proceed I make sure you upload
+
+69
+00:03:02,360 --> 00:03:05,239
+all your project files to the GitHub so
+
+70
+00:03:05,239 --> 00:03:07,879
+this is my GitHub now I have uploaded
+
+71
+00:03:07,879 --> 00:03:09,560
+all my project files here after you
+
+72
+00:03:09,560 --> 00:03:11,440
+upload all your project files to the gab
+
+73
+00:03:11,440 --> 00:03:14,159
+then just go to the railway. app this is
+
+74
+00:03:14,159 --> 00:03:16,159
+the
+
+75
+00:03:16,159 --> 00:03:19,319
+website click on start a new project and
+
+76
+00:03:19,319 --> 00:03:21,920
+select the deploy from GitHub repo click
+
+77
+00:03:21,920 --> 00:03:25,360
+that and click on configure GitHub
+
+78
+00:03:25,360 --> 00:03:28,519
+app here we need to authenticate our
+
+79
+00:03:28,519 --> 00:03:31,200
+GitHub here just scroll down and select
+
+80
+00:03:31,200 --> 00:03:34,519
+the repos stories so this is my repos
+
+81
+00:03:34,519 --> 00:03:38,080
+story let me select that and click our
+
+82
+00:03:38,080 --> 00:03:42,040
+save so now select the portfolio and
+
+83
+00:03:42,040 --> 00:03:44,120
+click on deploy
+
+84
+00:03:44,120 --> 00:03:46,680
+now when you go to the dashboard now you
+
+85
+00:03:46,680 --> 00:03:48,319
+can see a new project has been built
+
+86
+00:03:48,319 --> 00:03:50,599
+here click on that as you can see our
+
+87
+00:03:50,599 --> 00:03:52,879
+project has been
+
+88
+00:03:52,879 --> 00:03:56,480
+built select the lest build now and
+
+89
+00:03:56,480 --> 00:03:57,840
+select the build
+
+90
+00:03:57,840 --> 00:04:00,519
+locks as you can see here you considered
+
+91
+00:04:00,519 --> 00:04:02,879
+our project has been deploying just give
+
+92
+00:04:02,879 --> 00:04:05,280
+you a few
+
+93
+00:04:10,760 --> 00:04:13,560
+minutes if you done everything correct
+
+94
+00:04:13,560 --> 00:04:15,319
+then we don't have to do anything here
+
+95
+00:04:15,319 --> 00:04:17,519
+the rway will do everything for us and
+
+96
+00:04:17,519 --> 00:04:18,519
+deploy
+
+97
+00:04:18,519 --> 00:04:21,120
+it as you can see now our project has
+
+98
+00:04:21,120 --> 00:04:22,639
+been deployed
+
+99
+00:04:22,639 --> 00:04:25,400
+successfully this is our URL let me
+
+100
+00:04:25,400 --> 00:04:26,600
+click the
+
+101
+00:04:26,600 --> 00:04:30,080
+URL when you register for in the railway
+
+102
+00:04:30,080 --> 00:04:32,440
+for the first time you won't get the URL
+
+103
+00:04:32,440 --> 00:04:34,680
+straight away what is just go to the
+
+104
+00:04:34,680 --> 00:04:36,960
+settings and under the public networking
+
+105
+00:04:36,960 --> 00:04:40,000
+you will have to generate your to
+
+106
+00:04:40,000 --> 00:04:44,000
+URL so remember to do this otherwise the
+
+107
+00:04:44,000 --> 00:04:46,240
+website link will not be usable for you
+
+108
+00:04:46,240 --> 00:04:49,000
+so let me open that URL as you can see
+
+109
+00:04:49,000 --> 00:04:51,520
+our Jango app has been deployed
+
+110
+00:04:51,520 --> 00:04:53,400
+successfully but when you go to the
+
+111
+00:04:53,400 --> 00:04:55,880
+admin panel when you try to log to the
+
+112
+00:04:55,880 --> 00:04:59,280
+admin panel
+
+113
+00:05:00,160 --> 00:05:02,160
+we will get a error like CSR
+
+114
+00:05:02,160 --> 00:05:04,759
+verification file for this we need to
+
+115
+00:05:04,759 --> 00:05:06,600
+change something in the settings. we may
+
+116
+00:05:06,600 --> 00:05:11,120
+file so let me copy this
+
+117
+00:05:13,840 --> 00:05:16,520
+line I paste it in the top of the
+
+118
+00:05:16,520 --> 00:05:19,639
+settings that VII and P paste it here
+
+119
+00:05:19,639 --> 00:05:22,960
+here we need to provide the URL of the
+
+120
+00:05:22,960 --> 00:05:24,120
+Jango
+
+121
+00:05:24,120 --> 00:05:28,000
+project so this is our project
+
+122
+00:05:28,000 --> 00:05:31,600
+URL we can find it also in the elant
+
+123
+00:05:31,600 --> 00:05:34,759
+dashboard copy the URL without the admin
+
+124
+00:05:34,759 --> 00:05:37,800
+URL let's copy all of that make sure you
+
+125
+00:05:37,800 --> 00:05:42,440
+include the htvs and paste it
+
+126
+00:05:42,639 --> 00:05:45,360
+here so we will have to redeploy it for
+
+127
+00:05:45,360 --> 00:05:49,000
+the just push it to the G now let me
+
+128
+00:05:49,000 --> 00:05:50,759
+open a new tab
+
+129
+00:05:50,759 --> 00:05:55,160
+and I will perform the get add
+
+130
+00:05:55,560 --> 00:05:58,160
+command and also commit
+
+131
+00:05:58,160 --> 00:06:02,160
+it let's push to the get up now let me
+
+132
+00:06:02,160 --> 00:06:04,000
+go to the LI
+
+133
+00:06:04,000 --> 00:06:06,240
+dashboard when you refresh the page you
+
+134
+00:06:06,240 --> 00:06:08,440
+can see a new build has been created
+
+135
+00:06:08,440 --> 00:06:11,520
+click on that and select the build
+
+136
+00:06:11,520 --> 00:06:15,080
+logs you can see that our deployment has
+
+137
+00:06:15,080 --> 00:06:17,360
+been restarted just give you a few
+
+138
+00:06:17,360 --> 00:06:19,520
+minutes now our deployment has been
+
+139
+00:06:19,520 --> 00:06:22,840
+successful let me go to the
+
+140
+00:06:24,160 --> 00:06:27,720
+URL let's misstion the admin panel now
+
+141
+00:06:27,720 --> 00:06:31,560
+let me log in using my current sh
+
+142
+00:06:32,880 --> 00:06:35,039
+as you can see now we successfully log
+
+143
+00:06:35,039 --> 00:06:36,960
+to the AC
+
+144
+00:06:36,960 --> 00:06:39,199
+dashboard if you want to add a custom
+
+145
+00:06:39,199 --> 00:06:41,560
+domain to this just go to the settings
+
+146
+00:06:41,560 --> 00:06:43,639
+and if you scroll down you can see
+
+147
+00:06:43,639 --> 00:06:45,639
+something like public here under the
+
+148
+00:06:45,639 --> 00:06:47,360
+public networking you can see option of
+
+149
+00:06:47,360 --> 00:06:49,680
+adding a custom domain here if you have
+
+150
+00:06:49,680 --> 00:06:52,800
+a domain just type
+
+151
+00:06:54,199 --> 00:06:57,680
+that and select the port choose the port
+
+152
+00:06:57,680 --> 00:07:00,520
+suggested by the raway and click on ADD
+
+153
+00:07:00,520 --> 00:07:03,000
+domain so after you add this record to
+
+154
+00:07:03,000 --> 00:07:05,560
+the domain provider then the domain will
+
+155
+00:07:05,560 --> 00:07:07,759
+be successfully configured to this val.
+
+156
+00:07:07,759 --> 00:07:10,759
+app so this is how you deploy janga app
+
+157
+00:07:10,759 --> 00:07:14,319
+to the r. app
