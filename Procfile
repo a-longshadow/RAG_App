@@ -1,1 +1,1 @@
-web: gunicorn django_rag.wsgi
+web: python manage.py migrate --noinput && python manage.py ensure_superuser --skip-if-exists && python manage.py init_settings && gunicorn django_rag.wsgi
