@@ -94,9 +94,27 @@ WSGI_APPLICATION = 'django_rag.wsgi.application'
 # Database Configuration
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# Railway automatically provides DATABASE_URL, fallback to component variables
-if dj_database_url and os.getenv('DATABASE_URL'):
-    # Railway deployment - use DATABASE_URL
+# Database Configuration - Railway and Local Support
+# Railway provides individual PG variables, build DATABASE_URL if needed
+
+# Check if we're on Railway (has PGDATABASE from Railway's PostgreSQL service)
+if os.getenv('PGDATABASE'):
+    # Railway deployment - use Railway's PostgreSQL variables
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('PGDATABASE'),
+            'USER': os.getenv('PGUSER'),
+            'PASSWORD': os.getenv('PGPASSWORD'),
+            'HOST': os.getenv('PGHOST'),
+            'PORT': os.getenv('PGPORT'),
+            'OPTIONS': {
+                'connect_timeout': 10,
+            },
+        }
+    }
+elif dj_database_url and os.getenv('DATABASE_URL'):
+    # Alternative Railway setup with DATABASE_URL
     DATABASES = {
         'default': dj_database_url.config(
             default=os.getenv('DATABASE_URL'),
@@ -105,15 +123,15 @@ if dj_database_url and os.getenv('DATABASE_URL'):
         )
     }
 else:
-    # Local development - use component variables
+    # Local development - use local environment variables with defaults
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('PGDATABASE', os.getenv('DB_NAME', 'rag_system')),
-            'USER': os.getenv('PGUSER', os.getenv('DB_USER', 'joe')),
-            'PASSWORD': os.getenv('PGPASSWORD', os.getenv('DB_PASSWORD', '')),
-            'HOST': os.getenv('PGHOST', os.getenv('DB_HOST', 'localhost')),
-            'PORT': os.getenv('PGPORT', os.getenv('DB_PORT', '5432')),
+            'NAME': os.getenv('DB_NAME', 'rag_system'),
+            'USER': os.getenv('DB_USER', 'joe'),
+            'PASSWORD': os.getenv('DB_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
             'OPTIONS': {
                 'connect_timeout': 10,
             },
