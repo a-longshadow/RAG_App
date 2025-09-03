@@ -1,0 +1,173 @@
+{% extends 'rag_app/base.html' %}
+{% load rag_extras %}
+
+{% block title %}Documents - RAG Document System{% endblock %}
+                                    {{ document.tags }}
+                                </span>
+                            </div>
+                            {% endif %}stem{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-0">
+    <!-- Page Header -->
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <div class="flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-900">My Documents</h1>
+            <a href="{% url 'home' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                Upload New Document
+            </a>
+        </div>
+        
+        <!-- Search Form -->
+        <form method="get" class="mt-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    {{ form.search }}
+                </div>
+                <div>
+                    {{ form.file_type }}
+                </div>
+                <div>
+                    {{ form.status }}
+                </div>
+                <div>
+                    <button type="submit" class="w-full bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                        Search
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Documents List -->
+    {% if documents %}
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">
+                Documents ({{ page_obj.paginator.count }})
+            </h2>
+        </div>
+        
+        <div class="divide-y divide-gray-200">
+            {% for document in documents %}
+            <div class="px-6 py-4 hover:bg-gray-50">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex-shrink-0">
+                            {% if document.file_type == 'pdf' %}
+                                <span class="text-2xl">📄</span>
+                            {% elif document.file_type == 'txt' %}
+                                <span class="text-2xl">📝</span>
+                            {% elif document.file_type == 'csv' %}
+                                <span class="text-2xl">📊</span>
+                            {% else %}
+                                <span class="text-2xl">📋</span>
+                            {% endif %}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <a href="{% url 'document_detail' document.id %}" class="text-lg font-medium text-gray-900 hover:text-indigo-600">
+                                {{ document.title }}
+                            </a>
+                            <p class="text-sm text-gray-500">
+                                {{ document.file_name }} • 
+                                {{ document.file_size|filesizeformat }} • 
+                                Uploaded {{ document.uploaded_at|date:"M d, Y" }}
+                            </p>
+                            {% if document.tags %}
+                            <div class="mt-1">
+                                {% for tag in document.tags|split:"," %}
+                                    <span class="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full mr-1">
+                                        {{ tag }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                        <div class="text-right">
+                            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full
+                                {% if document.status == 'processed' %}bg-green-100 text-green-800
+                                {% elif document.status == 'processing' %}bg-yellow-100 text-yellow-800
+                                {% elif document.status == 'failed' %}bg-red-100 text-red-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ document.get_status_display }}
+                            </span>
+                            {% if document.chunk_count > 0 %}
+                                <p class="text-xs text-gray-500 mt-1">{{ document.chunk_count }} chunks</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="flex space-x-1">
+                            <a href="{% url 'document_detail' document.id %}" class="text-indigo-600 hover:text-indigo-900 text-sm">
+                                View
+                            </a>
+                            <span class="text-gray-300">|</span>
+                            <a href="{% url 'delete_document' document.id %}" 
+                               onclick="return confirm('Are you sure you want to delete this document?')"
+                               class="text-red-600 hover:text-red-900 text-sm">
+                                Delete
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="mt-6 flex justify-between items-center">
+        <div class="text-sm text-gray-500">
+            Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} documents
+        </div>
+        
+        <nav class="flex space-x-2">
+            {% if page_obj.has_previous %}
+                <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.file_type %}&file_type={{ request.GET.file_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                   class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50">First</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.file_type %}&file_type={{ request.GET.file_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                   class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50">Previous</a>
+            {% endif %}
+            
+            <span class="px-3 py-2 text-sm bg-indigo-50 border border-indigo-300 rounded-md">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.file_type %}&file_type={{ request.GET.file_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                   class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.file_type %}&file_type={{ request.GET.file_type }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+                   class="px-3 py-2 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50">Last</a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <!-- No Documents -->
+    <div class="bg-white shadow rounded-lg p-8">
+        <div class="text-center">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No documents found</h3>
+            <p class="mt-1 text-sm text-gray-500">
+                {% if request.GET.search or request.GET.file_type or request.GET.status %}
+                    Try adjusting your search criteria or clearing the filters.
+                {% else %}
+                    Get started by uploading your first document.
+                {% endif %}
+            </p>
+            <div class="mt-6">
+                <a href="{% url 'home' %}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                    Upload Document
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

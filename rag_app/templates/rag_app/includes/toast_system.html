@@ -1,0 +1,196 @@
+<!-- Toast Container -->
+<div id="toast-container" class="fixed top-4 right-4 z-50 space-y-3">
+</div>
+
+<!-- Toast Template (hidden) -->
+<div id="toast-template" class="hidden">
+    <div class="max-w-sm bg-white border border-gray-200 rounded-xl shadow-lg transform transition-all duration-300 ease-in-out translate-x-full opacity-0">
+        <div class="p-4">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <!-- Success Icon -->
+                    <div class="toast-icon-success hidden w-5 h-5 text-green-500">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <!-- Error Icon -->
+                    <div class="toast-icon-error hidden w-5 h-5 text-red-500">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <!-- Warning Icon -->
+                    <div class="toast-icon-warning hidden w-5 h-5 text-yellow-500">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <!-- Info Icon -->
+                    <div class="toast-icon-info hidden w-5 h-5 text-blue-500">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ml-3 flex-1">
+                    <p class="toast-title text-sm font-medium text-gray-900"></p>
+                    <p class="toast-message text-sm text-gray-500 mt-1"></p>
+                </div>
+                <div class="ml-4 flex-shrink-0">
+                    <button type="button" class="toast-close inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <span class="sr-only">Close</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+class ToastSystem {
+    constructor() {
+        this.container = document.getElementById('toast-container');
+        this.template = document.getElementById('toast-template');
+        this.toasts = [];
+    }
+
+    show(type, title, message, duration = 5000) {
+        const toast = this.createToast(type, title, message);
+        this.container.appendChild(toast);
+        this.toasts.push(toast);
+
+        // Animate in
+        setTimeout(() => {
+            toast.classList.remove('translate-x-full', 'opacity-0');
+            toast.classList.add('translate-x-0', 'opacity-100');
+        }, 10);
+
+        // Auto dismiss
+        if (duration > 0) {
+            setTimeout(() => {
+                this.dismiss(toast);
+            }, duration);
+        }
+
+        return toast;
+    }
+
+    createToast(type, title, message) {
+        const toast = this.template.cloneNode(true);
+        toast.removeAttribute('id');
+        toast.classList.remove('hidden');
+
+        // Set content
+        toast.querySelector('.toast-title').textContent = title;
+        toast.querySelector('.toast-message').textContent = message;
+
+        // Show appropriate icon
+        const icons = toast.querySelectorAll('[class*="toast-icon-"]');
+        icons.forEach(icon => icon.classList.add('hidden'));
+        const targetIcon = toast.querySelector(`.toast-icon-${type}`);
+        if (targetIcon) {
+            targetIcon.classList.remove('hidden');
+        }
+
+        // Add close handler
+        const closeButton = toast.querySelector('.toast-close');
+        closeButton.addEventListener('click', () => {
+            this.dismiss(toast);
+        });
+
+        // Add color classes based on type
+        const toastDiv = toast.querySelector('div[class*="bg-white"]');
+        switch(type) {
+            case 'success':
+                toastDiv.classList.add('border-l-4', 'border-green-500');
+                break;
+            case 'error':
+                toastDiv.classList.add('border-l-4', 'border-red-500');
+                break;
+            case 'warning':
+                toastDiv.classList.add('border-l-4', 'border-yellow-500');
+                break;
+            case 'info':
+                toastDiv.classList.add('border-l-4', 'border-blue-500');
+                break;
+        }
+
+        return toast;
+    }
+
+    dismiss(toast) {
+        toast.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+            const index = this.toasts.indexOf(toast);
+            if (index > -1) {
+                this.toasts.splice(index, 1);
+            }
+        }, 300);
+    }
+
+    success(title, message, duration = 5000) {
+        return this.show('success', title, message, duration);
+    }
+
+    error(title, message, duration = 8000) {
+        return this.show('error', title, message, duration);
+    }
+
+    warning(title, message, duration = 6000) {
+        return this.show('warning', title, message, duration);
+    }
+
+    info(title, message, duration = 5000) {
+        return this.show('info', title, message, duration);
+    }
+
+    clear() {
+        this.toasts.forEach(toast => this.dismiss(toast));
+    }
+}
+
+// Global toast instance
+window.toast = new ToastSystem();
+
+// Handle Django messages if present
+document.addEventListener('DOMContentLoaded', function() {
+    // Convert Django messages to toasts
+    const djangoMessages = document.querySelectorAll('.django-message');
+    djangoMessages.forEach(function(msg) {
+        const level = msg.dataset.level;
+        const text = msg.textContent.trim();
+        
+        let type = 'info';
+        let title = 'Notification';
+        
+        switch(level) {
+            case 'success':
+                type = 'success';
+                title = 'Success';
+                break;
+            case 'error':
+                type = 'error';
+                title = 'Error';
+                break;
+            case 'warning':
+                type = 'warning';
+                title = 'Warning';
+                break;
+            case 'info':
+                type = 'info';
+                title = 'Info';
+                break;
+        }
+        
+        window.toast.show(type, title, text);
+        msg.remove(); // Remove the original Django message
+    });
+});
+</script>

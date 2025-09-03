@@ -1,0 +1,184 @@
+{% load rag_extras %}
+{% extends "rag_app/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Document Header -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title">{{ document.title }}</h1>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <p><strong>Uploaded:</strong> {{ document.created_at|date:"M j, Y g:i A" }}</p>
+                            <p><strong>File Type:</strong> {{ document.file_type|upper }}</p>
+                            <p><strong>File Size:</strong> {{ document.file_size|filesizeformat }}</p>
+                            {% if document.category %}
+                                <p><strong>Category:</strong> {{ document.category }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Status:</strong> 
+                                <span class="badge {% if document.is_processed %}badge-success{% else %}badge-warning{% endif %}">
+                                    {% if document.is_processed %}Processed{% else %}Processing...{% endif %}
+                                </span>
+                            </p>
+                            <p><strong>Chunks:</strong> {{ document.chunks.count }}</p>
+                            {% if document.tags %}
+                                <p><strong>Tags:</strong> 
+                                    {% for tag in document.tags|split:"," %}
+                                        <span class="badge badge-secondary">{{ tag|strip }}</span>
+                                    {% endfor %}
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Processing Progress -->
+                    {% if not document.is_processed %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-spinner fa-spin"></i> 
+                            Document is being processed. This page will automatically update when processing is complete.
+                            <div class="progress mt-2">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     role="progressbar" style="width: 75%">
+                                    Processing chunks and embeddings...
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <a href="{% url 'document_list' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Documents
+            </a>
+            <a href="{{ document.file.url }}" target="_blank" class="btn btn-primary">
+                <i class="fas fa-download"></i> Download Original
+            </a>
+            <a href="{% url 'query' %}?document={{ document.id }}" class="btn btn-success">
+                <i class="fas fa-search"></i> Query This Document
+            </a>
+            <button class="btn btn-danger" onclick="deleteDocument({{ document.id }})">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </div>
+    </div>
+
+    <!-- Chunks Display -->
+    {% if document.chunks.exists %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-puzzle-piece"></i> Document Chunks ({{ document.chunks.count }})</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for chunk in document.chunks.all %}
+                            <div class="chunk-item mb-3 p-3 border rounded">
+                                <div class="chunk-header d-flex justify-content-between">
+                                    <h6>Chunk {{ forloop.counter }}</h6>
+                                    <small class="text-muted">{{ chunk.content|length }} characters</small>
+                                </div>
+                                <div class="chunk-content">
+                                    <p>{{ chunk.content|truncatewords:50 }}</p>
+                                    {% if chunk.content|length > 200 %}
+                                        <button class="btn btn-sm btn-outline-primary" onclick="toggleChunk({{ forloop.counter0 }})">
+                                            <span id="toggle-text-{{ forloop.counter0 }}">Show Full Content</span>
+                                        </button>
+                                        <div id="full-content-{{ forloop.counter0 }}" class="full-content mt-2" style="display: none;">
+                                            <p>{{ chunk.content }}</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    No chunks found. The document may still be processing.
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function toggleChunk(index) {
+    const fullContent = document.getElementById(`full-content-${index}`);
+    const toggleText = document.getElementById(`toggle-text-${index}`);
+    
+    if (fullContent.style.display === 'none') {
+        fullContent.style.display = 'block';
+        toggleText.textContent = 'Hide Full Content';
+    } else {
+        fullContent.style.display = 'none';
+        toggleText.textContent = 'Show Full Content';
+    }
+}
+
+function deleteDocument(documentId) {
+    if (confirm('Are you sure you want to delete this document? This action cannot be undone.')) {
+        fetch(`/documents/${documentId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            },
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = '{% url "document_list" %}';
+            } else {
+                alert('Error deleting document');
+            }
+        });
+    }
+}
+
+// Auto-refresh if document is still processing
+{% if not document.is_processed %}
+    setTimeout(function() {
+        location.reload();
+    }, 5000); // Refresh every 5 seconds
+{% endif %}
+</script>
+
+<style>
+.chunk-item {
+    background-color: #f8f9fa;
+    transition: box-shadow 0.2s;
+}
+
+.chunk-item:hover {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.full-content {
+    background-color: white;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+}
+
+.progress {
+    height: 20px;
+}
+
+.badge {
+    margin-right: 5px;
+}
+</style>
+{% endblock %}

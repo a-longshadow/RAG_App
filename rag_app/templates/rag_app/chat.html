@@ -1,0 +1,464 @@
+{% extends "rag_app/base.html" %}
+
+{% block title %}Chat - RAG System{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex flex-col">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b px-4 py-3">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="{% url 'home' %}" class="text-gray-600 hover:text-gray-900 mr-4">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                </a>
+                <h1 class="text-lg font-semibold text-gray-900">AI Document Chat</h1>
+            </div>
+            <div class="flex items-center space-x-2 text-sm text-gray-600">
+                <span id="model-indicator" class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
+                    {{ selected_model|default:"No model selected" }}
+                </span>
+                <a href="{% url 'model_selection' %}" class="text-indigo-600 hover:text-indigo-500">
+                    Change Model
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Container -->
+    <div class="flex-1 max-w-4xl mx-auto w-full flex flex-col">
+        <!-- Messages Area -->
+        <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-4">
+            <!-- Welcome Message -->
+            <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <div class="bg-white rounded-lg shadow-sm border p-4">
+                        <div class="prose prose-sm">
+                            <p class="text-gray-900 mb-2">👋 <strong>Welcome to your AI Document Assistant!</strong></p>
+                            <p class="text-gray-700">I can help you search through your documents and answer questions about them. Here's what I can do:</p>
+                            <ul class="text-gray-700 mt-2">
+                                <li>🔍 <strong>Smart Search:</strong> Find relevant information across all your documents</li>
+                                <li>💬 <strong>Natural Chat:</strong> Ask questions in plain English</li>
+                                <li>📄 <strong>Source References:</strong> See exactly where answers come from</li>
+                                <li>🤖 <strong>Multiple AI Models:</strong> Choose from 100+ AI models</li>
+                            </ul>
+                            {% if user.is_authenticated %}
+                                {% if stats.total_documents > 0 %}
+                                    <p class="text-green-700 mt-3">✅ You have <strong>{{ stats.total_documents }} document{{ stats.total_documents|pluralize }}</strong> ready to search!</p>
+                                {% else %}
+                                    <p class="text-amber-700 mt-3">📤 <strong>Upload some documents first</strong> to get started with intelligent search.</p>
+                                {% endif %}
+                            {% else %}
+                                <p class="text-blue-700 mt-3">🔑 <strong>Sign in</strong> to upload and search your documents.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">Just now</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="border-t bg-white p-4">
+            <div class="flex items-end space-x-3">
+                <div class="flex-1">
+                    <div class="relative">
+                        <textarea 
+                            id="message-input"
+                            placeholder="Ask me anything about your documents..."
+                            class="w-full resize-none border border-gray-300 rounded-lg px-4 py-3 pr-12 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            rows="1"
+                            maxlength="2000"
+                        ></textarea>
+                        <button 
+                            id="send-button"
+                            class="absolute right-2 top-2 p-2 text-gray-400 hover:text-indigo-600 disabled:opacity-50"
+                            disabled
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between mt-2 text-xs text-gray-500">
+                        <span>Press Shift+Enter for new line, Enter to send</span>
+                        <span id="char-count">0/2000</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center h-full">
+            <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
+                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+                <span class="text-gray-900">Processing your question...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Message Templates -->
+<template id="user-message-template">
+    <div class="flex items-start space-x-3 justify-end">
+        <div class="flex-1 text-right">
+            <div class="inline-block bg-indigo-600 text-white rounded-lg p-4 max-w-md">
+                <p class="message-text"></p>
+            </div>
+            <div class="text-xs text-gray-500 mt-2 timestamp"></div>
+        </div>
+        <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="ai-message-template">
+    <div class="flex items-start space-x-3">
+        <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"></path>
+                </svg>
+            </div>
+        </div>
+        <div class="flex-1">
+            <div class="bg-white rounded-lg shadow-sm border p-4">
+                <div class="prose prose-sm message-text"></div>
+                <div class="sources-section mt-4 hidden">
+                    <div class="border-t pt-3">
+                        <h4 class="text-sm font-medium text-gray-900 mb-2">📄 Sources:</h4>
+                        <div class="sources-list space-y-1"></div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between mt-3 pt-3 border-t">
+                    <div class="flex items-center space-x-4 text-xs text-gray-500">
+                        <span class="model-info"></span>
+                        <span class="timing-info"></span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button class="copy-button text-gray-400 hover:text-gray-600 p-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                        </button>
+                        <button class="regenerate-button text-gray-400 hover:text-gray-600 p-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="text-xs text-gray-500 mt-2 timestamp"></div>
+        </div>
+    </div>
+</template>
+
+<template id="typing-indicator-template">
+    <div class="flex items-start space-x-3 typing-indicator">
+        <div class="flex-shrink-0">
+            <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"></path>
+                </svg>
+            </div>
+        </div>
+        <div class="flex-1">
+            <div class="bg-white rounded-lg shadow-sm border p-4">
+                <div class="flex items-center space-x-2">
+                    <span class="text-gray-600">AI is thinking</span>
+                    <div class="flex space-x-1">
+                        <div class="w-1 h-1 bg-gray-400 rounded-full animate-bounce"></div>
+                        <div class="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                        <div class="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+class ChatInterface {
+    constructor() {
+        this.messages = [];
+        this.isProcessing = false;
+        this.init();
+    }
+
+    init() {
+        this.messageInput = document.getElementById('message-input');
+        this.sendButton = document.getElementById('send-button');
+        this.messagesContainer = document.getElementById('messages-container');
+        this.charCount = document.getElementById('char-count');
+        
+        this.setupEventListeners();
+        this.autoResizeTextarea();
+    }
+
+    setupEventListeners() {
+        // Send button click
+        this.sendButton.addEventListener('click', () => this.sendMessage());
+        
+        // Enter key to send (Shift+Enter for new line)
+        this.messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.sendMessage();
+            }
+        });
+        
+        // Character count and enable/disable send button
+        this.messageInput.addEventListener('input', () => {
+            const length = this.messageInput.value.length;
+            this.charCount.textContent = `${length}/2000`;
+            this.sendButton.disabled = length === 0 || this.isProcessing;
+            this.autoResizeTextarea();
+        });
+        
+        // Copy buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.copy-button')) {
+                this.copyMessage(e.target.closest('.copy-button'));
+            }
+            if (e.target.closest('.regenerate-button')) {
+                this.regenerateMessage(e.target.closest('.regenerate-button'));
+            }
+        });
+    }
+
+    autoResizeTextarea() {
+        this.messageInput.style.height = 'auto';
+        this.messageInput.style.height = Math.min(this.messageInput.scrollHeight, 120) + 'px';
+    }
+
+    async sendMessage() {
+        const message = this.messageInput.value.trim();
+        if (!message || this.isProcessing) return;
+
+        this.isProcessing = true;
+        this.sendButton.disabled = true;
+        
+        // Add user message
+        this.addUserMessage(message);
+        
+        // Clear input
+        this.messageInput.value = '';
+        this.charCount.textContent = '0/2000';
+        this.autoResizeTextarea();
+        
+        // Show typing indicator
+        this.showTypingIndicator();
+        
+        try {
+            // Send query to backend
+            const response = await fetch('/chat/query/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': this.getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    message: message,
+                    conversation_id: this.getConversationId()
+                })
+            });
+
+            const data = await response.json();
+            
+            // Remove typing indicator
+            this.removeTypingIndicator();
+            
+            if (data.success) {
+                this.addAIMessage(data);
+            } else {
+                this.addErrorMessage(data.error || 'Failed to process your message');
+            }
+            
+        } catch (error) {
+            this.removeTypingIndicator();
+            this.addErrorMessage('Connection error. Please try again.');
+            console.error('Chat error:', error);
+        }
+        
+        this.isProcessing = false;
+        this.sendButton.disabled = false;
+    }
+
+    addUserMessage(message) {
+        const template = document.getElementById('user-message-template');
+        const messageElement = template.content.cloneNode(true);
+        
+        messageElement.querySelector('.message-text').textContent = message;
+        messageElement.querySelector('.timestamp').textContent = this.formatTime(new Date());
+        
+        this.messagesContainer.appendChild(messageElement);
+        this.scrollToBottom();
+    }
+
+    addAIMessage(data) {
+        const template = document.getElementById('ai-message-template');
+        const messageElement = template.content.cloneNode(true);
+        
+        // Set message text
+        messageElement.querySelector('.message-text').innerHTML = this.formatResponse(data.response);
+        
+        // Set timestamp
+        messageElement.querySelector('.timestamp').textContent = this.formatTime(new Date());
+        
+        // Set model and timing info with response type indicator
+        const isConversational = data.is_conversational || false;
+        const responseType = isConversational ? 
+            '<span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full mr-2">LLM ONLY</span>' :
+            '<span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full mr-2">DOCUMENT-BASED</span>';
+        
+        messageElement.querySelector('.model-info').innerHTML = `${responseType}Model: ${data.model || 'Unknown'}`;
+        
+        let timingInfo = `Response: ${data.total_time || 0}s`;
+        if (!isConversational && data.search_time) {
+            timingInfo += ` (Search: ${data.search_time}s, LLM: ${data.llm_time || 0}s)`;
+        }
+        if (!isConversational && data.chunks_found !== undefined) {
+            timingInfo += ` • ${data.chunks_found} chunks`;
+        }
+        messageElement.querySelector('.timing-info').textContent = timingInfo;
+        
+        // Add sources if available
+        if (data.sources && data.sources.length > 0) {
+            const sourcesSection = messageElement.querySelector('.sources-section');
+            const sourcesList = messageElement.querySelector('.sources-list');
+            
+            data.sources.forEach(source => {
+                const sourceElement = document.createElement('div');
+                sourceElement.className = 'text-xs text-gray-600';
+                sourceElement.innerHTML = `
+                    <span class="font-medium">${source.document_title}</span>
+                    <span class="text-gray-500">(Page ${source.page_number || 'N/A'})</span>
+                `;
+                sourcesList.appendChild(sourceElement);
+            });
+            
+            sourcesSection.classList.remove('hidden');
+        }
+        
+        this.messagesContainer.appendChild(messageElement);
+        this.scrollToBottom();
+    }
+
+    addErrorMessage(error) {
+        const template = document.getElementById('ai-message-template');
+        const messageElement = template.content.cloneNode(true);
+        
+        messageElement.querySelector('.message-text').innerHTML = `
+            <div class="text-red-600">
+                <p><strong>❌ Error:</strong> ${error}</p>
+                <p class="text-sm mt-2">Please try again or contact support if the problem persists.</p>
+            </div>
+        `;
+        messageElement.querySelector('.timestamp').textContent = this.formatTime(new Date());
+        messageElement.querySelector('.model-info').textContent = 'Error occurred';
+        messageElement.querySelector('.timing-info').textContent = '';
+        
+        this.messagesContainer.appendChild(messageElement);
+        this.scrollToBottom();
+    }
+
+    showTypingIndicator() {
+        const template = document.getElementById('typing-indicator-template');
+        const indicator = template.content.cloneNode(true);
+        this.messagesContainer.appendChild(indicator);
+        this.scrollToBottom();
+    }
+
+    removeTypingIndicator() {
+        const indicator = this.messagesContainer.querySelector('.typing-indicator');
+        if (indicator) {
+            indicator.remove();
+        }
+    }
+
+    formatResponse(text) {
+        // Convert markdown-like formatting to HTML
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/\n\n/g, '</p><p>')
+            .replace(/\n/g, '<br>')
+            .replace(/^(.*)$/, '<p>$1</p>');
+    }
+
+    formatTime(date) {
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    scrollToBottom() {
+        setTimeout(() => {
+            this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+        }, 100);
+    }
+
+    getConversationId() {
+        // Generate or retrieve conversation ID
+        let conversationId = sessionStorage.getItem('conversationId');
+        if (!conversationId) {
+            conversationId = 'conv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            sessionStorage.setItem('conversationId', conversationId);
+        }
+        return conversationId;
+    }
+
+    getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    copyMessage(button) {
+        const messageText = button.closest('.bg-white').querySelector('.message-text').textContent;
+        navigator.clipboard.writeText(messageText).then(() => {
+            // Show temporary feedback
+            const original = button.innerHTML;
+            button.innerHTML = '<svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+            setTimeout(() => {
+                button.innerHTML = original;
+            }, 2000);
+        });
+    }
+
+    regenerateMessage(button) {
+        // Implementation for regenerating the last AI response
+        console.log('Regenerate clicked');
+    }
+}
+
+// Initialize chat interface when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    new ChatInterface();
+});
+</script>
+
+{% endblock %}

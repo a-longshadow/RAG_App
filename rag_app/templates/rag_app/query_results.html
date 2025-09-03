@@ -1,0 +1,285 @@
+{% extends 'rag_app/base.html' %}
+
+{% block title %}Query Results - RAG Document System{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-0">
+    <!-- Query Header -->
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <div class="flex justify-between items-start">
+            <div class="flex-1">
+                <h1 class="text-2xl font-bold text-gray-900">Query Results</h1>
+                <p class="mt-2 text-lg text-gray-600">
+                    <span class="font-medium">Query:</span> "{{ query }}"
+                </p>
+                
+                {% if response %}
+                <div class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                        <span class="font-medium text-gray-500">Chunks Found:</span>
+                        <span class="ml-2 text-gray-900">{{ response.total_chunks_found }}</span>
+                    </div>
+                    <div>
+                        <span class="font-medium text-gray-500">Search Time:</span>
+                        <span class="ml-2 text-gray-900">{{ response.search_time|floatformat:3 }}s</span>
+                    </div>
+                    <div>
+                        <span class="font-medium text-gray-500">LLM Time:</span>
+                        <span class="ml-2 text-gray-900">{{ response.llm_time|floatformat:3 }}s</span>
+                    </div>
+                    <div>
+                        <span class="font-medium text-gray-500">Total Time:</span>
+                        <span class="ml-2 text-gray-900">{{ response.total_time|floatformat:3 }}s</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="ml-6">
+                <a href="{% url 'home' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                    ← Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+        {% if response %}
+        <!-- AI Response -->
+        <div class="bg-white shadow rounded-lg p-6 mb-6">
+            {% if is_conversational %}
+                <div class="flex items-center mb-4">
+                    <div class="flex-shrink-0">
+                        <svg class="h-6 w-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="ml-3 text-xl font-semibold text-gray-900">💬 Conversational Response</h2>
+                    <span class="ml-3 bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">LLM ONLY</span>
+                </div>
+                
+                <div class="prose prose-lg max-w-none">
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+                        <div class="text-blue-800">{{ response.response_text|linebreaks }}</div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 text-sm text-gray-500 bg-blue-50 p-3 rounded-md">
+                    <p class="flex items-center">
+                        <svg class="h-4 w-4 text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <strong>How this works:</strong> This is a general conversational response from the AI model without document search. For document-specific questions, try uploading relevant files first!
+                    </p>
+                </div>
+            {% else %}
+                <div class="flex items-center mb-4">
+                    <div class="flex-shrink-0">
+                        <svg class="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="ml-3 text-xl font-semibold text-gray-900">🤖 RAG-Enhanced Response</h2>
+                    <span class="ml-3 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">DOCUMENT-BASED</span>
+                </div>
+                
+                <div class="prose prose-lg max-w-none">
+                    <div class="bg-green-50 border-l-4 border-green-400 p-4">
+                        {{ response.response_text|linebreaks }}
+                    </div>
+                </div>
+                
+                <div class="mt-4 text-sm text-gray-500 bg-green-50 p-3 rounded-md">
+                    <p class="flex items-center">
+                        <svg class="h-4 w-4 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <strong>How this works:</strong> This response was generated using {{ response.total_chunks_found }} relevant chunks from your documents, then enhanced with AI analysis. Sources are shown below.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Source Chunks -->
+        {% if response.source_chunks %}
+        <div class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">
+                Source Information ({{ response.source_chunks|length }} chunks)
+            </h2>
+            
+            <div class="space-y-4">
+                {% for chunk_result in response.source_chunks %}
+                <div class="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="font-medium text-gray-900">
+                                <a href="{% url 'document_detail' chunk_result.chunk.document.id %}" 
+                                   class="text-indigo-600 hover:text-indigo-500">
+                                    {{ chunk_result.chunk.document.title }}
+                                </a>
+                            </h3>
+                            <p class="text-sm text-gray-500">{{ chunk_result.chunk.document.file_name }}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm font-medium text-gray-900">
+                                Similarity: {{ chunk_result.similarity_score|floatformat:3 }}
+                            </div>
+                            <div class="text-xs text-gray-500">
+                                Rank #{{ chunk_result.rank }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <div class="text-sm text-gray-700 bg-gray-50 p-3 rounded-md">
+                            {{ chunk_result.chunk.content }}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2 flex items-center space-x-4 text-xs text-gray-500">
+                        <span>Position: {{ chunk_result.chunk.start_char }}-{{ chunk_result.chunk.end_char }}</span>
+                        <span>Words: {{ chunk_result.chunk.word_count }}</span>
+                        <span>Chunk #{{ chunk_result.chunk.chunk_index }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <span class="text-2xl">⚠️</span>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-yellow-800">No Relevant Sources Found</h3>
+                    <div class="mt-2 text-sm text-yellow-700">
+                        <p>The AI couldn't find any document chunks that were similar enough to your query. Try:</p>
+                        <ul class="mt-2 list-disc list-inside">
+                            <li>Using different keywords or phrases</li>
+                            <li>Making your query more specific</li>
+                            <li>Checking if relevant documents have been uploaded</li>
+                            <li>Lowering the similarity threshold in your query</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    {% elif fallback_search %}
+        <!-- Fallback Search Results -->
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <span class="text-2xl">⚠️</span>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-yellow-800">Using Fallback Search</h3>
+                    <div class="mt-2 text-sm text-yellow-700">
+                        <p>RAG processing failed, showing basic text search results instead.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if matching_documents %}
+        <div class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">
+                Matching Documents ({{ matching_documents|length }})
+            </h2>
+            
+            <div class="space-y-4">
+                {% for document in matching_documents %}
+                <div class="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-medium text-gray-900">
+                                <a href="{% url 'document_detail' document.id %}" 
+                                   class="text-indigo-600 hover:text-indigo-500">
+                                    {{ document.title }}
+                                </a>
+                            </h3>
+                            <p class="text-sm text-gray-500">{{ document.file_name }}</p>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            {{ document.chunk_count }} chunks
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2 text-sm text-gray-600">
+                        {{ document.content|truncatewords:50 }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
+            <div class="text-center">
+                <span class="text-6xl">📭</span>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No matching documents found</h3>
+                <p class="mt-1 text-sm text-gray-500">
+                    No documents contain the text you searched for.
+                </p>
+            </div>
+        </div>
+        {% endif %}
+
+    {% else %}
+        <!-- No Results -->
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
+            <div class="text-center">
+                <span class="text-6xl">🤔</span>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No results to display</h3>
+                <p class="mt-1 text-sm text-gray-500">
+                    Please try submitting a query from the home page.
+                </p>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- New Query Form -->
+    <div class="mt-6 bg-white shadow rounded-lg p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Ask Another Question</h3>
+        
+        <form method="post" action="{% url 'query_documents' %}" class="space-y-4">
+            {% csrf_token %}
+            
+            <div>
+                {{ form.query.label_tag }}
+                {{ form.query }}
+                {% if form.query.help_text %}
+                    <p class="mt-2 text-sm text-gray-500">{{ form.query.help_text }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    {{ form.similarity_threshold.label_tag }}
+                    {{ form.similarity_threshold }}
+                    {% if form.similarity_threshold.help_text %}
+                        <p class="mt-1 text-xs text-gray-500">{{ form.similarity_threshold.help_text }}</p>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    {{ form.max_results.label_tag }}
+                    {{ form.max_results }}
+                    {% if form.max_results.help_text %}
+                        <p class="mt-1 text-xs text-gray-500">{{ form.max_results.help_text }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="flex justify-end">
+                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    Ask Question
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

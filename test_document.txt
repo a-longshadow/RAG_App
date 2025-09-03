@@ -1,0 +1,41 @@
+Django RAG System Test Document
+
+This is a test document for the Django RAG (Retrieval-Augmented Generation) system. 
+
+The system uses several key technologies:
+
+1. Django Framework: A high-level Python web framework that encourages rapid development and clean, pragmatic design. It handles the web interface, user management, and database operations.
+
+2. PostgreSQL with pgvector: A powerful, open-source relational database system with advanced vector extension capabilities for storing and querying high-dimensional vectors efficiently.
+
+3. Sentence Transformers: A Python framework for state-of-the-art sentence and text embeddings. It provides easy methods to compute dense vector representations for sentences and paragraphs.
+
+4. OpenRouter API: A unified API that provides access to multiple large language models including Claude, Llama, and Mistral, enabling flexible AI-powered responses.
+
+Key Features:
+- Document upload and processing with support for PDF, TXT, CSV, JSON, and Markdown formats
+- Automatic text extraction and intelligent chunking for optimal embedding generation
+- Vector similarity search using cosine similarity for precise document retrieval
+- Real-time processing status tracking with background task execution
+- Comprehensive admin interface for document and embedding management
+- User authentication and document ownership for multi-user environments
+
+Technical Implementation:
+The system processes documents by first extracting text content, then splitting it into manageable chunks with overlap to preserve context. Each chunk is converted into a 768-dimensional vector using the all-mpnet-base-v2 model. These vectors are stored in PostgreSQL using the pgvector extension, enabling efficient similarity searches.
+
+When a user submits a query, the system converts the query into a vector using the same embedding model, then performs a cosine similarity search against all stored document vectors. The most relevant chunks are retrieved and can be used to generate contextual responses using large language models via the OpenRouter API.
+
+This architecture ensures that the system can scale to handle large document collections while maintaining fast query response times and high relevance in retrieved content.
+
+Test Content Sections:
+
+Section A: Technical Architecture
+The RAG system follows a modular architecture with clear separation of concerns. The document processing pipeline handles file uploads, text extraction, and chunk creation. The embedding pipeline generates and stores vector representations. The query engine performs similarity searches and context assembly.
+
+Section B: Data Flow
+Documents flow through the system in stages: upload → text extraction → chunking → embedding generation → storage. Queries follow a parallel path: input → embedding → similarity search → context retrieval → response generation.
+
+Section C: Performance Considerations
+The system is optimized for both storage efficiency and query speed. Vector indexing in PostgreSQL enables sub-second similarity searches even with thousands of documents. Background processing ensures responsive user interfaces during document ingestion.
+
+This test document should generate multiple chunks and demonstrate the full document processing pipeline including text extraction, chunking, embedding generation, and vector storage.

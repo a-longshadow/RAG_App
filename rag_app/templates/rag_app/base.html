@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RAG Document System{% endblock %}</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom styles -->
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="gradient-bg shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'home' %}" class="text-white text-xl font-bold">
+                        📚 RAG Document System
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'home' %}" class="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium">
+                            Home
+                        </a>
+                        <a href="{% url 'chat_interface' %}" class="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                            💬 Chat <span class="ml-1 text-xs bg-green-400 px-1 rounded">NEW</span>
+                        </a>
+                        <a href="{% url 'query_documents' %}" class="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium flex items-center">
+                            � Advanced Query <span class="ml-1 text-xs bg-blue-400 px-1 rounded">API</span>
+                        </a>
+                        <a href="{% url 'document_list' %}" class="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium">
+                            Documents
+                        </a>
+                        <a href="{% url 'model_selection' %}" class="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium">
+                            Models
+                        </a>
+                        <a href="{% url 'analytics_dashboard' %}" class="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium">
+                            Analytics
+                        </a>
+                        <a href="/admin/" class="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium">
+                            Admin
+                        </a>
+                        <span class="text-gray-200">Welcome, {{ user.username }}</span>
+                        <a href="/admin/logout/" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md text-sm font-medium">
+                            Logout
+                        </a>
+                    {% else %}
+                        <a href="/admin/login/" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-md text-sm font-medium">
+                            Login
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages (Hidden - converted to toasts) -->
+    {% if messages %}
+        <div class="hidden">
+            {% for message in messages %}
+                <div class="django-message" data-level="{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Include Toast System -->
+    {% include 'rag_app/includes/toast_system.html' %}
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p>&copy; 2025 RAG Document System. Built with Django + PostgreSQL + pgvector.</p>
+                <p class="text-gray-400 text-sm mt-2">
+                    Using sentence-transformers for local embeddings • OpenRouter API for LLM integration
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for dynamic features -->
+    <script>
+        // Document status polling for upload page
+        function pollDocumentStatus(documentId) {
+            fetch(`/api/documents/${documentId}/status/`)
+                .then(response => response.json())
+                .then(data => {
+                    const statusElement = document.getElementById('document-status');
+                    if (statusElement) {
+                        statusElement.textContent = data.status;
+                        
+                        if (data.status === 'processed') {
+                            statusElement.className = 'bg-green-100 text-green-800 px-2 py-1 rounded';
+                            document.getElementById('chunk-count').textContent = data.chunk_count;
+                            window.toast.success('Processing Complete', `Document processed successfully with ${data.chunk_count} chunks.`);
+                        } else if (data.status === 'failed') {
+                            statusElement.className = 'bg-red-100 text-red-800 px-2 py-1 rounded';
+                            if (data.processing_error) {
+                                document.getElementById('error-message').textContent = data.processing_error;
+                                document.getElementById('error-container').style.display = 'block';
+                                window.toast.error('Processing Failed', data.processing_error);
+                            }
+                        } else if (data.status === 'processing') {
+                            statusElement.className = 'bg-yellow-100 text-yellow-800 px-2 py-1 rounded';
+                            // Continue polling
+                            setTimeout(() => pollDocumentStatus(documentId), 2000);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error polling status:', error);
+                    window.toast.error('Status Error', 'Unable to check document processing status.');
+                });
+        }
+    </script>
+
+    {% block extra_js %}
+    {% endblock %}
+</body>
+</html>
