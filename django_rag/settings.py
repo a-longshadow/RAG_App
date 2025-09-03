@@ -13,7 +13,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-import dj_database_url
+
+# Only import dj_database_url if needed (for Railway deployment)
+try:
+    import dj_database_url
+except ImportError:
+    dj_database_url = None
 
 # Load environment variables
 load_dotenv()
@@ -86,27 +91,32 @@ TEMPLATES = [
 WSGI_APPLICATION = 'django_rag.wsgi.application'
 
 
-# Database
+# Database Configuration
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# Railway PostgreSQL configuration
-DATABASE_URL = os.getenv('DATABASE_URL')
-
-if DATABASE_URL:
+# Railway automatically provides DATABASE_URL, fallback to component variables
+if dj_database_url and os.getenv('DATABASE_URL'):
     # Railway deployment - use DATABASE_URL
     DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+        'default': dj_database_url.config(
+            default=os.getenv('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
 else:
-    # Local development
+    # Local development - use component variables
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME', 'rag_system'),
-            'USER': os.getenv('DB_USER', 'joe'),
-            'PASSWORD': os.getenv('DB_PASSWORD', ''),
-            'HOST': os.getenv('DB_HOST', 'localhost'),
-            'PORT': os.getenv('DB_PORT', '5432'),
+            'NAME': os.getenv('PGDATABASE', os.getenv('DB_NAME', 'rag_system')),
+            'USER': os.getenv('PGUSER', os.getenv('DB_USER', 'joe')),
+            'PASSWORD': os.getenv('PGPASSWORD', os.getenv('DB_PASSWORD', '')),
+            'HOST': os.getenv('PGHOST', os.getenv('DB_HOST', 'localhost')),
+            'PORT': os.getenv('PGPORT', os.getenv('DB_PORT', '5432')),
+            'OPTIONS': {
+                'connect_timeout': 10,
+            },
         }
     }
 
