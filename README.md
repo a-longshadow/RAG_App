@@ -4,7 +4,7 @@
 ![Django](https://img.shields.io/badge/django-4.2+-green.svg)
 ![PostgreSQL](https://img.shields.io/badge/postgresql-17+-blue.svg)
 ![pgvector](https://img.shields.io/badge/pgvector-0.8.0-orange.svg)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![License](https://img.shields.io/badge/license-GPLv3-blue.svg)
 
 ## 🎯 **SYSTEM STATUS: PRODUCTION READY** ✅
 
@@ -318,3 +318,8 @@ graph TD
 
 *Last Updated: September 2, 2025*
 *Status: Production Ready*
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
+See the LICENSE file for full terms.
