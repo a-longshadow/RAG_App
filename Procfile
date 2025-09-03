@@ -1,2 +1,1 @@
-release: python manage.py migrate --noinput && python manage.py ensure_superuser --skip-if-exists && python manage.py init_settings
-web: gunicorn django_rag.wsgi:application --bind 0.0.0.0:$PORT --workers 4
+web: gunicorn django_rag.wsgi
