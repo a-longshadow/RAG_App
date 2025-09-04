@@ -5,7 +5,7 @@
 NIXPACKS_PYTHON_VERSION = "3.12"
 
 [phases.setup]
-nixPkgs = ["python312", "gcc", "pkg-config", "stdenv.cc.cc.lib", "libstdcxx5"]
+nixPkgs = ["python312", "gcc", "pkg-config", "stdenv.cc.cc.lib"]
 
 [phases.install]
 cmds = [
