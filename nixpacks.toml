@@ -1,11 +1,11 @@
-# Railway Nixpacks Configuration - Fixed Python Environment
-# Ensure proper virtual environment setup and C++ libraries
+# Railway Nixpacks Configuration - WORKING SOLUTION
+# Includes correct library paths for NumPy and C++ dependencies
 
 [variables]
 NIXPACKS_PYTHON_VERSION = "3.12"
 
 [phases.setup]
-nixPkgs = ["python312", "gcc", "pkg-config", "stdenv.cc.cc.lib"]
+nixPkgs = ["python312", "gcc", "pkg-config", "stdenv.cc.cc.lib", "zlib"]
 
 [phases.install]
 cmds = [
@@ -20,4 +20,4 @@ cmds = [
 ]
 
 [start]
-cmd = ". /opt/venv/bin/activate && gunicorn django_rag.wsgi"
+cmd = ". /opt/venv/bin/activate && export LD_LIBRARY_PATH=\"/nix/store/ybjcla5bhj8g1y84998pn4a2drfxybkv-gcc-13.3.0-lib/lib:/nix/store/bzk3q2l71qwhycsip23y6rl5n881la4n-zlib-1.3.1/lib:$LD_LIBRARY_PATH\" && gunicorn django_rag.wsgi"
