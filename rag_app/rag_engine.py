@@ -69,15 +69,21 @@ class RAGConfig:
                 setting = SystemSettings.objects.get(key=setting_key)
                 value = setting.value
                 
-                # Type conversion based on setting type
-                if setting.value_type == 'float':
-                    value = float(value)
-                elif setting.value_type == 'integer':
-                    value = int(value)
-                elif setting.value_type == 'boolean':
-                    value = value.lower() in ('true', '1', 'yes', 'on')
+                # Enhanced type conversion with error handling
+                try:
+                    if setting.value_type == 'float' or config_attr in ['similarity_threshold', 'temperature']:
+                        value = float(value)
+                    elif setting.value_type == 'integer' or config_attr in ['max_chunks', 'max_context_length', 'max_tokens']:
+                        value = int(value)
+                    elif setting.value_type == 'boolean' or config_attr == 'include_metadata':
+                        value = value.lower() in ('true', '1', 'yes', 'on')
+                    # Keep string values as-is for model names
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"Type conversion failed for {setting_key}={value}: {e}. Using default.")
+                    continue
                 
                 setattr(config, config_attr, value)
+                logger.debug(f"Loaded setting {setting_key}={value} (type: {type(value).__name__})")
             except SystemSettings.DoesNotExist:
                 logger.info(f"Setting {setting_key} not found, using default")
                 continue
@@ -212,10 +218,14 @@ class RAGQueryEngine:
             chunks_query = chunks_query.filter(document__id__in=document_ids)
         
         # Perform similarity search using pgvector
+        # Ensure similarity_threshold is a float for calculation
+        threshold = float(self.config.similarity_threshold) if isinstance(self.config.similarity_threshold, str) else self.config.similarity_threshold
+        distance_threshold = 1.0 - threshold  # Convert similarity to distance
+        
         similar_chunks = chunks_query.annotate(
             similarity=CosineDistance('embedding__vector', query_embedding)
         ).filter(
-            similarity__lt=1.0 - self.config.similarity_threshold  # Convert to distance
+            similarity__lt=distance_threshold
         ).order_by('similarity')[:self.config.max_chunks * 2]  # Get extra for filtering
         
         # Convert to SearchResult objects with similarity scores
