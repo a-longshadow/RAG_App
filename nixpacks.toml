@@ -1,0 +1,17 @@
+# Railway Nixpacks Configuration - Fix C++ library issues
+# Add libstdc++ and other C++ libraries for numpy/pgvector
+
+[variables]
+NIXPACKS_PYTHON_VERSION = "3.12"
+
+[phases.setup]
+nixPkgs = ["python312", "gcc", "pkg-config", "stdenv.cc.cc.lib", "libstdcxx5"]
+
+[phases.install]
+cmds = [
+    "pip install --upgrade pip",
+    "pip install -r requirements.txt"
+]
+
+[start]
+cmd = "gunicorn django_rag.wsgi"
